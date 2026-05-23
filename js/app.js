@@ -17,6 +17,8 @@
   const winModal = document.getElementById('win-modal');
   const solverLoading = document.getElementById('solver-loading');
   const solverLoadingText = document.getElementById('solver-loading-text');
+  const appEl = document.getElementById('app');
+  const PHONE_LANDSCAPE = window.matchMedia('(orientation: landscape) and (max-height: 500px)');
 
   const previewCard = { suit: 'hearts', rank: 1, faceUp: true };
 
@@ -178,7 +180,8 @@
       const neededW = board.offsetWidth;
       if (!availableH || !availableW || !neededH || !neededW) return;
 
-      const scale = Math.min(1, availableH / neededH, availableW / neededW);
+      const widthBuffer = 6;
+      const scale = Math.min(1, availableH / neededH, (availableW - widthBuffer) / neededW);
       if (scale >= 0.999) return;
 
       const clamped = Math.max(0.5, scale);
@@ -338,11 +341,21 @@
     }, 1000);
   }
 
+  function updateLayoutMode() {
+    const landscape = PHONE_LANDSCAPE.matches;
+    const onGame = gameScreen && !gameScreen.hidden;
+    document.body.classList.toggle('phone-landscape', landscape);
+    document.body.classList.toggle('game-landscape', landscape && onGame);
+    appEl?.classList.toggle('phone-landscape', landscape);
+    if (onGame) fitGameBoard();
+  }
+
   function showScreen(screen) {
     menuScreen.hidden = screen !== 'menu';
     settingsScreen.hidden = screen !== 'settings';
     gameScreen.hidden = screen !== 'game';
     document.body.classList.toggle('game-active', screen === 'game');
+    updateLayoutMode();
     if (screen === 'game') {
       window.scrollTo(0, 0);
       gameScreen.scrollTop = 0;
@@ -978,5 +991,12 @@
   initDifficultyPicker();
   SolitaireSolver.loadWasm();
   window.addEventListener('resize', fitGameBoard);
+  window.visualViewport?.addEventListener('resize', fitGameBoard);
+  PHONE_LANDSCAPE.addEventListener('change', updateLayoutMode);
+  window.addEventListener('orientationchange', () => {
+    requestAnimationFrame(updateLayoutMode);
+  });
+  window.visualViewport?.addEventListener('resize', updateLayoutMode);
+  updateLayoutMode();
   showScreen('menu');
 })();

@@ -41,7 +41,10 @@
 
     _buildLayout() {
       this.board.innerHTML = '';
-      this.board.classList.add('solitaire-board');
+      this.board.classList.remove('solitaire-board');
+
+      const boardRoot = el('div', 'solitaire-board');
+      this.boardRoot = boardRoot;
 
       const upper = el('div', 'board-upper');
       const upperLeft = el('div', 'upper-left');
@@ -67,8 +70,9 @@
         this.tableauRow.appendChild(col);
       }
 
-      this.board.appendChild(upper);
-      this.board.appendChild(this.tableauRow);
+      boardRoot.appendChild(upper);
+      boardRoot.appendChild(this.tableauRow);
+      this.board.appendChild(boardRoot);
 
       this.stockEl.addEventListener('click', () => this._onStockClick());
     }
@@ -419,7 +423,7 @@
 
     _celebrateWin() {
       SolitaireAudio.win();
-      this.board.classList.add('game-won');
+      (this.boardRoot || this.board).classList.add('game-won');
       this._spawnConfetti();
       this.onWin();
     }

@@ -168,6 +168,7 @@
       const board = wrap?.querySelector('.solitaire-board');
       if (!wrap || !board) return;
 
+      wrap.style.marginBottom = '0';
       board.style.setProperty('--board-scale', '1');
       board.style.marginBottom = '0';
 
@@ -182,8 +183,19 @@
 
       const clamped = Math.max(0.5, scale);
       board.style.setProperty('--board-scale', String(clamped));
-      board.style.marginBottom = `${Math.round(neededH * (clamped - 1))}px`;
+      const excess = Math.round(neededH * (1 - clamped));
+      wrap.style.marginBottom = excess > 0 ? `-${excess}px` : '0';
     });
+  }
+
+  function updateGameActionsVisibility() {
+    const bar = document.getElementById('game-actions');
+    if (!bar) return;
+    const undoBtn = document.getElementById('btn-undo');
+    const autoBtn = document.getElementById('btn-auto-complete');
+    const undoHidden = !undoBtn || undoBtn.hidden;
+    const autoHidden = !autoBtn || autoBtn.hidden;
+    bar.classList.toggle('is-empty', undoHidden && autoHidden);
   }
 
   function ensureBoardResizeObserver() {
@@ -200,6 +212,7 @@
     if (!btn) return;
     if (engine?.isWon()) {
       btn.hidden = true;
+      updateGameActionsVisibility();
       updateAutoCompleteButton();
       return;
     }
@@ -207,6 +220,7 @@
     const canUndo = Boolean(engine?.canUndo()) && !ui?.animating;
     btn.disabled = !canUndo;
     btn.setAttribute('aria-disabled', String(!canUndo));
+    updateGameActionsVisibility();
     updateAutoCompleteButton();
     fitGameBoard();
   }
@@ -229,6 +243,7 @@
     } else {
       btn.textContent = 'Auto-complete';
     }
+    updateGameActionsVisibility();
     fitGameBoard();
   }
 
@@ -556,7 +571,7 @@
         showWinModal();
       };
       ui.onLayout = fitGameBoard;
-      boardEl.classList.remove('game-won');
+      boardEl.querySelector('.solitaire-board')?.classList.remove('game-won');
     }
 
     clearEndgameState();

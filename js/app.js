@@ -1015,29 +1015,14 @@
     { passive: false }
   );
 
-  function warmSolver() {
-    SolitaireSolver.loadWasm();
-  }
-
-  function scheduleSolverWarm() {
-    if (typeof requestIdleCallback === 'function') {
-      requestIdleCallback(warmSolver, { timeout: 5000 });
-      return;
-    }
-    setTimeout(warmSolver, 2000);
-  }
-
   CardAssets.preload().then(() => buildAppearancePickers());
   initDifficultyPicker();
-  menuScreen?.addEventListener('pointerdown', warmSolver, { once: true, passive: true });
-  scheduleSolverWarm();
+  SolitaireSolver.loadWasm();
   window.addEventListener('resize', fitGameBoard);
-  window.visualViewport?.addEventListener('resize', fitGameBoard);
   PHONE_LANDSCAPE.addEventListener('change', updateLayoutMode);
   window.addEventListener('orientationchange', () => {
     requestAnimationFrame(updateLayoutMode);
   });
-  window.visualViewport?.addEventListener('resize', updateLayoutMode);
   updateLayoutMode();
   showScreen('menu');
 })();

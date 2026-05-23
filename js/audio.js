@@ -44,12 +44,7 @@
   }
 
   if (typeof document !== 'undefined') {
-    const onGesture = () => {
-      unlock();
-    };
-    document.addEventListener('touchstart', onGesture, { capture: true, passive: true });
-    document.addEventListener('touchend', onGesture, { capture: true, passive: true });
-    document.addEventListener('click', onGesture, { capture: true });
+    document.addEventListener('touchstart', () => unlock(), { once: true, passive: true });
   }
 
   function tone(freq, duration, type, gain, when) {

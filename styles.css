@@ -667,26 +667,6 @@ button.mode-card:focus-visible {
   min-height: 0;
 }
 
-.game-rail {
-  display: contents;
-}
-
-.game-header {
-  order: 1;
-}
-
-.game-actions {
-  order: 2;
-}
-
-.game-board-wrap {
-  order: 3;
-}
-
-.game-footer {
-  order: 4;
-}
-
 body.game-active {
   overflow: hidden;
 }
@@ -2045,7 +2025,6 @@ body.game-active {
   body.game-landscape .game-header {
     grid-column: 1;
     grid-row: 1;
-    order: unset;
     position: relative;
     z-index: 6;
     grid-template-columns: auto minmax(0, 1fr) auto auto;
@@ -2058,24 +2037,9 @@ body.game-active {
   body.game-landscape .game-board-wrap {
     grid-column: 1;
     grid-row: 2;
-    order: unset;
     flex: unset;
     min-height: 0;
     padding: 2px 4px;
-  }
-
-  body.game-landscape .game-rail {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: stretch;
-    gap: 6px;
-    grid-column: 2;
-    grid-row: 1 / -1;
-    min-width: 74px;
-    padding: 6px 8px 6px 4px;
-    border-left: 1px solid rgba(255, 255, 255, 0.12);
-    align-self: stretch;
   }
 
   body.game-landscape .game-subtitle {
@@ -2100,13 +2064,17 @@ body.game-active {
   }
 
   body.game-landscape .game-actions {
-    order: unset;
+    grid-column: 2;
+    grid-row: 1;
+    align-self: end;
     position: static;
     display: flex;
     flex-direction: column;
     align-items: stretch;
     gap: 6px;
-    padding: 0;
+    min-width: 74px;
+    padding: 0 8px 4px 4px;
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
   }
 
   body.game-landscape .game-actions.is-empty {
@@ -2114,9 +2082,12 @@ body.game-active {
   }
 
   body.game-landscape .game-footer {
-    order: unset;
+    grid-column: 2;
+    grid-row: 2;
+    align-self: start;
     position: static;
-    padding: 0;
+    padding: 4px 8px 0 4px;
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
     pointer-events: auto;
     z-index: auto;
   }
@@ -2145,7 +2116,8 @@ body.game-active {
     position: static;
   }
 
-  body.game-landscape .game-rail .btn {
+  body.game-landscape .game-actions .btn,
+  body.game-landscape .game-footer-actions .btn {
     width: 100%;
     padding: 6px 8px;
     font-size: 0.68rem;

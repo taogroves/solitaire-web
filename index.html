@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#1a5c38" />
+  <title>Solitaire</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="felt-bg" aria-hidden="true"></div>
+
+  <div id="app" class="app">
+  <div id="menu-screen" class="screen screen-menu">
+    <header class="hero">
+      <h1 class="title">For Mary <3</h1>
+    </header>
+
+    <div class="mode-cards">
+      <button type="button" class="mode-card" id="btn-appearance">
+        <span class="mode-icon" aria-hidden="true">🃏</span>
+        <h2>Card appearance</h2>
+        <p>Choose standard faces, back design, and back color.</p>
+      </button>
+
+      <div class="mode-card mode-card-random" id="random-deal-card">
+        <span class="mode-icon" aria-hidden="true">🎲</span>
+        <div class="random-deal-row">
+          <h2>Random deal</h2>
+          <div id="random-difficulty" class="difficulty-segmented" role="radiogroup" aria-label="Difficulty">
+            <div class="difficulty-segmented-track">
+              <span class="difficulty-segmented-thumb" aria-hidden="true"></span>
+              <button type="button" class="difficulty-segmented-btn" data-tier-index="0" role="radio" aria-checked="false">Easy</button>
+              <button type="button" class="difficulty-segmented-btn" data-tier-index="1" role="radio" aria-checked="true">Medium</button>
+              <button type="button" class="difficulty-segmented-btn" data-tier-index="2" role="radio" aria-checked="false">Hard</button>
+              <button type="button" class="difficulty-segmented-btn" data-tier-index="3" role="radio" aria-checked="false">Expert</button>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary btn-deal" id="btn-random-deal">Deal</button>
+      </div>
+
+      <button type="button" class="mode-card mode-card-daily" id="btn-daily">
+        <span class="mode-icon" aria-hidden="true">☀️</span>
+        <h2>Daily challenge</h2>
+        <p>Same deal for everyone today. Share the date and compare scores.</p>
+      </button>
+
+      <div class="mode-card mode-card-seed">
+        <span class="mode-icon" aria-hidden="true">🔑</span>
+        <h2>Play by seed</h2>
+        <p>Enter any word or phrase to replay an exact layout.</p>
+        <div class="seed-row">
+          <input type="text" id="seed-input" placeholder="e.g. lucky-7 or 2026-05-23" autocomplete="off" spellcheck="false" />
+          <button type="button" class="btn btn-primary" id="btn-seed">Deal</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="hint">Double-tap a card to send it to a foundation. Drag stacks on the tableau.</p>
+    <p class="card-attribution">
+      Playing-card artwork: <a href="https://totalnonsense.com/open-source-vector-playing-cards/" target="_blank" rel="noopener">Vector Playing Cards 3.2</a> by Chris Aguilar (LGPL 3.0).
+    </p>
+  </div>
+
+  <div id="settings-screen" class="screen screen-settings" hidden>
+    <header class="settings-header">
+      <button type="button" class="btn btn-ghost" id="btn-settings-back" aria-label="Back to menu">←</button>
+      <h1 class="settings-title">Card appearance</h1>
+    </header>
+
+    <div class="picker-stack">
+      <section class="picker-section">
+        <h2 class="picker-heading">Face style</h2>
+        <div id="face-picker" class="picker-row" role="radiogroup" aria-label="Face style"></div>
+      </section>
+
+      <section class="picker-section">
+        <h2 class="picker-heading">Back style</h2>
+        <div id="back-picker" class="picker-row" role="radiogroup" aria-label="Back style"></div>
+      </section>
+
+      <section class="picker-section" id="back-color-section" hidden>
+        <h2 class="picker-heading">Back color</h2>
+        <div id="back-color-picker" class="picker-row" role="radiogroup" aria-label="Back color"></div>
+      </section>
+    </div>
+
+    <footer class="settings-footer">
+      <button type="button" class="btn btn-primary btn-block" id="btn-settings-done">Done</button>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen screen-game" hidden>
+    <header class="game-header">
+      <button type="button" class="btn btn-ghost" id="btn-menu" aria-label="Menu">☰</button>
+      <div class="game-title-wrap">
+        <h1 class="game-title">For Mary <3</h1>
+        <div class="game-subtitle" id="game-subtitle">
+          <div class="game-subtitle-mode" id="game-subtitle-mode"></div>
+          <div class="game-subtitle-seed-row">
+            <span class="game-subtitle-seed" id="game-subtitle-seed"></span>
+            <span class="difficulty-badge" id="game-difficulty-badge" aria-hidden="true"></span>
+          </div>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><span class="stat-label">Time</span><span class="stat-value" id="timer-display">0:00</span></div>
+        <div class="stat"><span class="stat-label">Moves</span><span class="stat-value" id="moves-display">0</span></div>
+      </div>
+      <button type="button" class="btn btn-ghost btn-mute" id="btn-mute" aria-label="Toggle sound" aria-pressed="false">🔊</button>
+    </header>
+
+    <main id="game-board" class="game-board-wrap" aria-label="Solitaire board"></main>
+
+    <footer class="game-footer">
+      <button type="button" class="btn btn-secondary" id="btn-new-game">New deal</button>
+    </footer>
+  </div>
+  </div><!-- #app -->
+
+  <div id="solver-loading" class="solver-loading" hidden aria-live="polite" aria-busy="true">
+    <div class="solver-loading-panel">
+      <div class="solver-spinner" aria-hidden="true"></div>
+      <p id="solver-loading-text" class="solver-loading-text">Finding a solvable deal…</p>
+    </div>
+  </div>
+
+  <div id="win-modal" class="modal" hidden role="dialog" aria-labelledby="win-title" aria-modal="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-panel">
+      <div class="modal-glow" aria-hidden="true"></div>
+      <h2 id="win-title" class="modal-title">You win!</h2>
+      <p id="win-sub" class="modal-sub">Brilliant play.</p>
+      <dl class="win-stats">
+        <div><dt>Time</dt><dd id="win-time">0:00</dd></div>
+        <div><dt>Your moves</dt><dd id="win-moves">0</dd></div>
+        <div><dt>Optimal</dt><dd id="win-optimal">—</dd></div>
+        <div class="win-stat-full">
+          <dt>Seed</dt>
+          <dd id="win-seed-row" class="win-seed-row">
+            <span class="win-seed-text" id="win-seed-text">—</span>
+            <span class="difficulty-badge" id="win-difficulty-badge" aria-hidden="true"></span>
+          </dd>
+        </div>
+      </dl>
+      <p id="win-message" class="win-message" hidden></p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-primary" id="win-try-again">Try again</button>
+        <button type="button" class="btn btn-secondary" id="win-new-deal">New deal</button>
+        <button type="button" class="btn btn-ghost" id="win-to-menu">Main menu</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/seedrandom.min.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/difficulty.js"></script>
+  <script src="js/seed-library.js"></script>
+  <script src="js/cards.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/solver.js"></script>
+  <script src="js/deal-cache.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "solitaire-solver",
+  "type": "module",
+  "description": "Perfect-information draw-three Klondike solver for solitaire-web",
+  "version": "0.1.0",
+  "license": "MIT",
+  "files": [
+    "solitaire_solver_bg.wasm",
+    "solitaire_solver.js",
+    "solitaire_solver.d.ts"
+  ],
+  "main": "solitaire_solver.js",
+  "types": "solitaire_solver.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

@@ -1,0 +1,238 @@
+{
+  "designs": [
+    {
+      "id": "diamond-lattice",
+      "name": "Diamond Lattice",
+      "defaultColor": "navy-blue",
+      "colors": [
+        "navy-blue",
+        "dark-red"
+      ],
+      "variants": [
+        {
+          "id": "navy-blue",
+          "name": "Navy Blue",
+          "file": "diamond-lattice/navy-blue.svg"
+        },
+        {
+          "id": "dark-red",
+          "name": "Dark Red",
+          "file": "diamond-lattice/dark-red.svg"
+        }
+      ]
+    },
+    {
+      "id": "wavy-stripe",
+      "name": "Wavy Stripe",
+      "defaultColor": "red",
+      "colors": [
+        "red",
+        "teal"
+      ],
+      "variants": [
+        {
+          "id": "red",
+          "name": "Red",
+          "file": "wavy-stripe/red.svg"
+        },
+        {
+          "id": "teal",
+          "name": "Teal",
+          "file": "wavy-stripe/teal.svg"
+        }
+      ]
+    },
+    {
+      "id": "solid-fill",
+      "name": "Solid Fill",
+      "defaultColor": "teal",
+      "colors": [
+        "teal",
+        "purple",
+        "gold",
+        "green",
+        "black",
+        "red"
+      ],
+      "variants": [
+        {
+          "id": "teal",
+          "name": "Teal",
+          "file": "solid-fill/teal.svg"
+        },
+        {
+          "id": "purple",
+          "name": "Purple",
+          "file": "solid-fill/purple.svg"
+        },
+        {
+          "id": "gold",
+          "name": "Gold",
+          "file": "solid-fill/gold.svg"
+        },
+        {
+          "id": "green",
+          "name": "Green",
+          "file": "solid-fill/green.svg"
+        },
+        {
+          "id": "black",
+          "name": "Black",
+          "file": "solid-fill/black.svg"
+        },
+        {
+          "id": "red",
+          "name": "Red",
+          "file": "solid-fill/red.svg"
+        }
+      ]
+    },
+    {
+      "id": "gingham-checkerboard",
+      "name": "Gingham / Checkerboard",
+      "defaultColor": "light-blue",
+      "colors": [
+        "light-blue",
+        "pink"
+      ],
+      "variants": [
+        {
+          "id": "light-blue",
+          "name": "Light Blue",
+          "file": "gingham-checkerboard/light-blue.svg"
+        },
+        {
+          "id": "pink",
+          "name": "Pink",
+          "file": "gingham-checkerboard/pink.svg"
+        }
+      ]
+    },
+    {
+      "id": "floral-rosette",
+      "name": "Floral Rosette",
+      "defaultColor": "pale-green",
+      "colors": [
+        "pale-green",
+        "yellow-green"
+      ],
+      "variants": [
+        {
+          "id": "pale-green",
+          "name": "Pale Green",
+          "file": "floral-rosette/pale-green.svg"
+        },
+        {
+          "id": "yellow-green",
+          "name": "Yellow Green",
+          "file": "floral-rosette/yellow-green.svg"
+        }
+      ]
+    },
+    {
+      "id": "dense-floral-tessellation",
+      "name": "Dense Floral Tessellation",
+      "defaultColor": "dark-green-yellow",
+      "colors": [
+        "dark-green-yellow",
+        "teal-green",
+        "yellow-green"
+      ],
+      "variants": [
+        {
+          "id": "dark-green-yellow",
+          "name": "Dark Green / Yellow",
+          "file": "dense-floral-tessellation/dark-green-yellow.svg"
+        },
+        {
+          "id": "teal-green",
+          "name": "Teal / Green",
+          "file": "dense-floral-tessellation/teal-green.svg"
+        },
+        {
+          "id": "yellow-green",
+          "name": "Yellow / Green",
+          "file": "dense-floral-tessellation/yellow-green.svg"
+        }
+      ]
+    },
+    {
+      "id": "diagonal-dash-pattern",
+      "name": "Diagonal Dash Pattern",
+      "defaultColor": "purple",
+      "colors": [
+        "purple",
+        "gold",
+        "green",
+        "black",
+        "red",
+        "blue"
+      ],
+      "variants": [
+        {
+          "id": "purple",
+          "name": "Purple",
+          "file": "diagonal-dash-pattern/purple.svg"
+        },
+        {
+          "id": "gold",
+          "name": "Gold",
+          "file": "diagonal-dash-pattern/gold.svg"
+        },
+        {
+          "id": "green",
+          "name": "Green",
+          "file": "diagonal-dash-pattern/green.svg"
+        },
+        {
+          "id": "black",
+          "name": "Black",
+          "file": "diagonal-dash-pattern/black.svg"
+        },
+        {
+          "id": "red",
+          "name": "Red",
+          "file": "diagonal-dash-pattern/red.svg"
+        },
+        {
+          "id": "blue",
+          "name": "Blue",
+          "file": "diagonal-dash-pattern/blue.svg"
+        }
+      ]
+    },
+    {
+      "id": "cross-line-minimal",
+      "name": "Cross-Line Minimal",
+      "defaultColor": "dark-red",
+      "colors": [
+        "dark-red",
+        "teal",
+        "black",
+        "green"
+      ],
+      "variants": [
+        {
+          "id": "dark-red",
+          "name": "Dark Red",
+          "file": "cross-line-minimal/dark-red.svg"
+        },
+        {
+          "id": "teal",
+          "name": "Teal",
+          "file": "cross-line-minimal/teal.svg"
+        },
+        {
+          "id": "black",
+          "name": "Black",
+          "file": "cross-line-minimal/black.svg"
+        },
+        {
+          "id": "green",
+          "name": "Green",
+          "file": "cross-line-minimal/green.svg"
+        }
+      ]
+    }
+  ]
+}

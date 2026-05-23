@@ -1,0 +1,119 @@
+/**
+ * Procedural sound effects via Web Audio API.
+ */
+(function (global) {
+  'use strict';
+
+  let ctx = null;
+  let muted = false;
+
+  function getCtx() {
+    if (!ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) ctx = new AC();
+    }
+    return ctx;
+  }
+
+  function resume() {
+    const c = getCtx();
+    if (c && c.state === 'suspended') c.resume();
+  }
+
+  function tone(freq, duration, type, gain, when) {
+    if (muted) return;
+    const c = getCtx();
+    if (!c) return;
+    const t0 = when ?? c.currentTime;
+    const osc = c.createOscillator();
+    const g = c.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, t0);
+    g.gain.setValueAtTime(0, t0);
+    g.gain.linearRampToValueAtTime(gain ?? 0.15, t0 + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.001, t0 + duration);
+    osc.connect(g);
+    g.connect(c.destination);
+    osc.start(t0);
+    osc.stop(t0 + duration + 0.05);
+  }
+
+  function noiseBurst(duration, gain) {
+    if (muted) return;
+    const c = getCtx();
+    if (!c) return;
+    const bufferSize = c.sampleRate * duration;
+    const buffer = c.createBuffer(1, bufferSize, c.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+    const src = c.createBufferSource();
+    src.buffer = buffer;
+    const g = c.createGain();
+    g.gain.value = gain ?? 0.08;
+    const filter = c.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 1200;
+    src.connect(filter);
+    filter.connect(g);
+    g.connect(c.destination);
+    src.start();
+  }
+
+  const AudioFX = {
+    resume,
+    setMuted(m) {
+      muted = !!m;
+    },
+    isMuted() {
+      return muted;
+    },
+    flip() {
+      resume();
+      tone(420, 0.06, 'triangle', 0.12);
+      noiseBurst(0.04, 0.05);
+    },
+    place() {
+      resume();
+      tone(280, 0.08, 'sine', 0.14);
+      tone(360, 0.06, 'sine', 0.08, getCtx()?.currentTime + 0.03);
+    },
+    draw() {
+      resume();
+      for (let i = 0; i < 3; i++) {
+        tone(200 + i * 40, 0.05, 'square', 0.06, (getCtx()?.currentTime ?? 0) + i * 0.04);
+      }
+    },
+    recycle() {
+      resume();
+      tone(150, 0.2, 'sawtooth', 0.1);
+    },
+    invalid() {
+      resume();
+      tone(120, 0.15, 'sawtooth', 0.12);
+      tone(90, 0.2, 'sawtooth', 0.1, (getCtx()?.currentTime ?? 0) + 0.08);
+    },
+    win() {
+      resume();
+      const c = getCtx();
+      if (!c) return;
+      const notes = [523, 659, 784, 1047, 1319];
+      notes.forEach((f, i) => tone(f, 0.35, 'sine', 0.12, c.currentTime + i * 0.12));
+      setTimeout(() => noiseBurst(0.3, 0.06), 400);
+    },
+    uiClick() {
+      resume();
+      tone(600, 0.04, 'sine', 0.08);
+    },
+    newDeal() {
+      resume();
+      const c = getCtx();
+      if (!c) return;
+      const t0 = c.currentTime;
+      const notes = [392, 494, 587, 784];
+      notes.forEach((f, i) => tone(f, 0.14, 'triangle', 0.1, t0 + i * 0.07));
+      tone(988, 0.22, 'sine', 0.09, t0 + 0.32);
+    },
+  };
+
+  global.SolitaireAudio = AudioFX;
+})(typeof window !== 'undefined' ? window : global);

@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 63.0000 88.0000" width="63.0000" height="88.0000"><defs><clipPath clipPathUnits="userSpaceOnUse" id="patternClipPath-4">
+      <rect y="0" x="0" height="128" width="128" id="clipPathRect-96" style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ffff00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:20;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:1.0989;stroke-opacity:1;marker:none;enable-background:accumulate" />
+    </clipPath>
+    <pattern patternTransform="matrix(0.06968883,0,0,0.06968883,652.76021,434.03783)" id="pattern23556-182" xlink:href="#pattern10446-310" inkscape:collect="always" />
+    <pattern inkscape:collect="always" xlink:href="#pattern3708-849" id="pattern10446-310" patternTransform="matrix(0.06968883,0,0,0.06968883,203.33594,5.8861684)" />
+    <pattern inkscape:collect="always" xlink:href="#pattern3670-6" id="pattern3708-849" patternTransform="matrix(0.06968883,0,0,0.06968883,-126.91161,172.16582)" />
+    <pattern patternUnits="userSpaceOnUse" width="128" height="128" patternTransform="matrix(0.26458333,0,0,0.26458333,-0.30238081,128.12024)" id="pattern3670-6">
+      <g inkscape:label="Helper Layer (don't use)" clip-path="url(#patternClipPath-4)" id="g55018" style="display:inline;opacity:1">
+        <g inkscape:groupmode="layer" id="g54964" inkscape:label="Pattern Background" transform="scale(1.28)" />
+        <g inkscape:groupmode="layer" id="g54976" inkscape:label="Pattern Foreground" transform="scale(1.28)">
+          <path inkscape:connector-curvature="0" id="path54966" d="M -13.416088,100 139.68516,-53.101245" style="fill:none;stroke:#ffffff;stroke-width:2.84940934;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+          <rect transform="rotate(45)" y="-50.363415" x="44.315952" height="19.53125" width="19.53125" id="rect54968" style="opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:2.84940934;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke fill markers" />
+          <rect style="opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:2.84940934;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke fill markers" id="rect54970" width="19.53125" height="19.53125" x="57.985622" y="21.683264" transform="rotate(45)" />
+          <rect transform="rotate(45)" y="-19.078171" x="101.19308" height="11.71875" width="11.71875" id="rect54972" style="opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.70964563;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke fill markers" />
+          <rect style="opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.70964563;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke fill markers" id="rect54974" width="11.71875" height="11.71875" x="9.9444695" y="-4.6365433" transform="rotate(45)" />
+        </g>
+        <g id="g54996" sodipodi:insensitive="true">
+          <use height="100%" width="100%" id="use54978" transform="translate(-128,-128)" xlink:href="#designBottom-6" y="0" x="0" />
+          <use height="100%" width="100%" id="use54980" transform="translate(0,-128)" xlink:href="#designBottom-6" y="0" x="0" />
+          <use height="100%" width="100%" id="use54982" transform="translate(128,-128)" xlink:href="#designBottom-6" y="0" x="0" />
+          <use height="100%" width="100%" id="use54984" transform="translate(-128)" xlink:href="#designBottom-6" y="0" x="0" />
+          <use height="100%" width="100%" id="use54986" xlink:href="#designBottom-6" y="0" x="0" />
+          <use height="100%" width="100%" id="use54988" transform="translate(128)" xlink:href="#designBottom-6" y="0" x="0" />
+          <use height="100%" width="100%" id="use54990" transform="translate(-128,128)" xlink:href="#designBottom-6" y="0" x="0" />
+          <use height="100%" width="100%" id="use54992" transform="translate(0,128)" xlink:href="#designBottom-6" y="0" x="0" />
+          <use transform="translate(128,128)" height="100%" width="100%" id="use54994" xlink:href="#designBottom-6" y="0" x="0" />
+        </g>
+        <g id="g55016" sodipodi:insensitive="true">
+          <use height="100%" width="100%" id="use54998" transform="translate(-128,-128)" xlink:href="#designTop-9" y="0" x="0" />
+          <use height="100%" width="100%" id="use55000" transform="translate(0,-128)" xlink:href="#designTop-9" y="0" x="0" />
+          <use height="100%" width="100%" id="use55002" transform="translate(128,-128)" xlink:href="#designTop-9" y="0" x="0" />
+          <use height="100%" width="100%" id="use55004" transform="translate(-128)" xlink:href="#designTop-9" y="0" x="0" />
+          <use height="100%" width="100%" id="use55006" xlink:href="#designTop-9" y="0" x="0" />
+          <use height="100%" width="100%" id="use55008" transform="translate(128)" xlink:href="#designTop-9" y="0" x="0" />
+          <use height="100%" width="100%" id="use55010" transform="translate(-128,128)" xlink:href="#designTop-9" y="0" x="0" />
+          <use height="100%" width="100%" id="use55012" transform="translate(0,128)" xlink:href="#designTop-9" y="0" x="0" />
+          <use transform="translate(128,128)" height="100%" width="100%" id="use55014" xlink:href="#designTop-9" y="0" x="0" />
+        </g>
+      </g>
+    </pattern>
+    </defs><g transform="matrix(1 0 0 1 -683.18079 -438.06396)"><rect ry="3" rx="3" y="438.06396" x="683.18079" height="88" width="63.000004" id="rect10420" style="opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke fill markers" />
+    </g><g transform="matrix(1 0 0 1 -683.18079 -438.06396)"><rect style="opacity:1;vector-effect:none;fill:url(#pattern23556-182);fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke fill markers" id="rect3706" width="63.000004" height="88" x="683.18079" y="438.06396" rx="3" ry="3" />
+  </g></svg>

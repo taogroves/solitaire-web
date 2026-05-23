@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 54.9345 79.2527" width="54.9345" height="79.2527"><defs><pattern patternTransform="matrix(0.02854398,0,0,0.02955226,1123.115,142.37494)" id="pattern49643" xlink:href="#pattern5775" inkscape:collect="always" />
+    <pattern patternTransform="matrix(0.03301156,0,0,0.03301156,627.20554,172.65654)" id="pattern5775" xlink:href="#pattern5020" inkscape:collect="always" />
+    <pattern id="pattern5020" height="256" width="256" patternUnits="userSpaceOnUse">
+      <g style="display:inline" id="fullPattern" clip-path="url(#patternClipPath)" inkscape:label="Helper Layer (don't use)">
+        <g transform="scale(2.56)" inkscape:label="Pattern Background" id="designBottom" inkscape:groupmode="layer" style="display:inline">
+          <rect style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#950000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0;marker:none;enable-background:accumulate" id="rect9111" width="100" height="100" x="0" y="0" />
+        </g>
+        <g transform="scale(2.56)" inkscape:label="Pattern Foreground" id="designTop" inkscape:groupmode="layer" style="display:inline">
+          <rect transform="rotate(-45)" ry="2.2002039" rx="2.2002039" y="21.385067" x="-26.529093" height="22.002037" width="22.002037" id="rect5010" style="fill:#ffffff;fill-opacity:1;stroke-width:0.16399351" />
+          <rect transform="rotate(-44.999998)" ry="1.4668026" rx="1.4668026" y="56.442696" x="17.056692" height="14.668026" width="14.668026" id="rect5012" style="fill:#ffffff;fill-opacity:1;stroke-width:0.10932901" />
+          <rect style="fill:#ffffff;fill-opacity:1;stroke-width:0.16399351" id="rect5008" width="22.002037" height="22.002037" x="-11.399232" y="104.53925" rx="2.2002039" ry="2.2002039" transform="rotate(-45)" />
+          <rect style="fill:#ffffff;fill-opacity:1;stroke-width:0.10932901" id="rect5014" width="14.668026" height="14.668026" x="-40.158924" y="68.675049" rx="1.4668026" ry="1.4668026" transform="rotate(-44.999998)" />
+          <path style="fill:none;stroke:#ffffff;stroke-width:2.34375;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="M -31.567267,79.481277 71.026352,-23.112341" id="path5018" inkscape:connector-curvature="0" />
+        </g>
+        <g sodipodi:insensitive="true" id="designBottomGenerator">
+          <use x="0" y="0" xlink:href="#designBottom" transform="translate(-256,-256)" id="bottom1" width="100%" height="100%" />
+          <use x="0" y="0" xlink:href="#designBottom" transform="translate(0,-256)" id="bottom2" width="100%" height="100%" />
+          <use x="0" y="0" xlink:href="#designBottom" transform="translate(256,-256)" id="bottom3" width="100%" height="100%" />
+          <use x="0" y="0" xlink:href="#designBottom" transform="translate(-256)" id="bottom4" width="100%" height="100%" />
+          <use x="0" y="0" xlink:href="#designBottom" id="bottom5" width="100%" height="100%" />
+          <use x="0" y="0" xlink:href="#designBottom" transform="translate(256)" id="bottom6" width="100%" height="100%" />
+          <use x="0" y="0" xlink:href="#designBottom" transform="translate(-256,256)" id="bottom7" width="100%" height="100%" />
+          <use x="0" y="0" xlink:href="#designBottom" transform="translate(0,256)" id="bottom8" width="100%" height="100%" />
+          <use x="0" y="0" xlink:href="#designBottom" id="bottom9" width="100%" height="100%" transform="translate(256,256)" />
+        </g>
+        <g sodipodi:insensitive="true" id="designTopGenerator">
+          <use x="0" y="0" xlink:href="#designTop" transform="translate(-256,-256)" id="top1" width="100%" height="100%" />
+          <use x="0" y="0" xlink:href="#designTop" transform="translate(0,-256)" id="top2" width="100%" height="100%" />
+          <use x="0" y="0" xlink:href="#designTop" transform="translate(256,-256)" id="top3" width="100%" height="100%" />
+          <use x="0" y="0" xlink:href="#designTop" transform="translate(-256)" id="top4" width="100%" height="100%" />
+          <use x="0" y="0" xlink:href="#designTop" id="top5" width="100%" height="100%" />
+          <use x="0" y="0" xlink:href="#designTop" transform="translate(256)" id="top6" width="100%" height="100%" />
+          <use x="0" y="0" xlink:href="#designTop" transform="translate(-256,256)" id="top7" width="100%" height="100%" />
+          <use x="0" y="0" xlink:href="#designTop" transform="translate(0,256)" id="top8" width="100%" height="100%" />
+          <use x="0" y="0" xlink:href="#designTop" id="top9" width="100%" height="100%" transform="translate(256,256)" />
+        </g>
+      </g>
+    </pattern>
+    <clipPath clipPathUnits="userSpaceOnUse" id="patternClipPath">
+      <rect y="0" x="0" height="256" width="256" id="clipPathRect" style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ffff00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:20;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:1.0989;stroke-opacity:1;marker:none;enable-background:accumulate" />
+    </clipPath>
+    </defs><g transform="matrix(1.0084536 0 0 1.0060205 -1142.9167 -151.37126)"><rect y="150.46538" x="1133.3359" height="78.778419" width="54.473976" id="rect58133" style="display:inline;fill:url(#pattern49643);fill-opacity:1;stroke:none;stroke-width:1.5875;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+  </g></svg>

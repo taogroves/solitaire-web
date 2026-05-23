@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 54.4740 78.7784" width="54.4740" height="78.7784"><defs><pattern patternTransform="matrix(0.02854398,0,0,0.02955224,357.64665,289.88293)" id="pattern9311" xlink:href="#pattern49645-1" />
+    <pattern xlink:href="#pattern5775-0" id="pattern49645-1" patternTransform="matrix(0.03301156,0,0,0.03301156,1115.1328,-63.075182)" />
+    <pattern xlink:href="#pattern5020-6" id="pattern5775-0" patternTransform="matrix(0.03301156,0,0,0.03301156,627.20554,172.65654)" />
+    <pattern patternUnits="userSpaceOnUse" width="256" height="256" id="pattern5020-6">
+      <g clip-path="url(#patternClipPath-7)" id="fullPattern-3" style="display:inline">
+        <g id="designBottom-7" transform="scale(2.56)">
+          <rect y="0" x="0" height="100" width="100" id="rect9111-7" style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#09224b;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0;marker:none;enable-background:accumulate" />
+        </g>
+        <g id="designTop-8" transform="scale(2.56)">
+          <rect style="fill:#ffffff;fill-opacity:1;stroke-width:0.16399351" id="rect5010-2" width="22.002037" height="22.002037" x="-26.529093" y="21.385067" rx="2.2002039" ry="2.2002039" transform="rotate(-45)" />
+          <rect style="fill:#ffffff;fill-opacity:1;stroke-width:0.10932901" id="rect5012-5" width="14.668026" height="14.668026" x="17.056692" y="56.442696" rx="1.4668026" ry="1.4668026" transform="rotate(-44.999998)" />
+          <rect transform="rotate(-45)" ry="2.2002039" rx="2.2002039" y="104.53925" x="-11.399232" height="22.002037" width="22.002037" id="rect5008-2" style="fill:#ffffff;fill-opacity:1;stroke-width:0.16399351" />
+          <rect transform="rotate(-44.999998)" ry="1.4668026" rx="1.4668026" y="68.675049" x="-40.158924" height="14.668026" width="14.668026" id="rect5014-4" style="fill:#ffffff;fill-opacity:1;stroke-width:0.10932901" />
+          <path id="path5018-8" d="M -31.567267,79.481277 71.026352,-23.112341" style="fill:none;stroke:#ffffff;stroke-width:2.34375;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+        </g>
+        <g id="designBottomGenerator-1">
+          <use height="100%" width="100%" id="bottom1-0" transform="translate(-256,-256)" xlink:href="#designBottom-7" y="0" x="0" />
+          <use height="100%" width="100%" id="bottom2-5" transform="translate(0,-256)" xlink:href="#designBottom-7" y="0" x="0" />
+          <use height="100%" width="100%" id="bottom3-4" transform="translate(256,-256)" xlink:href="#designBottom-7" y="0" x="0" />
+          <use height="100%" width="100%" id="bottom4-6" transform="translate(-256)" xlink:href="#designBottom-7" y="0" x="0" />
+          <use height="100%" width="100%" id="bottom5-0" xlink:href="#designBottom-7" y="0" x="0" />
+          <use height="100%" width="100%" id="bottom6-6" transform="translate(256)" xlink:href="#designBottom-7" y="0" x="0" />
+          <use height="100%" width="100%" id="bottom7-5" transform="translate(-256,256)" xlink:href="#designBottom-7" y="0" x="0" />
+          <use height="100%" width="100%" id="bottom8-4" transform="translate(0,256)" xlink:href="#designBottom-7" y="0" x="0" />
+          <use transform="translate(256,256)" height="100%" width="100%" id="bottom9-0" xlink:href="#designBottom-7" y="0" x="0" />
+        </g>
+        <g id="designTopGenerator-8">
+          <use height="100%" width="100%" id="top1-3" transform="translate(-256,-256)" xlink:href="#designTop-8" y="0" x="0" />
+          <use height="100%" width="100%" id="top2-9" transform="translate(0,-256)" xlink:href="#designTop-8" y="0" x="0" />
+          <use height="100%" width="100%" id="top3-2" transform="translate(256,-256)" xlink:href="#designTop-8" y="0" x="0" />
+          <use height="100%" width="100%" id="top4-7" transform="translate(-256)" xlink:href="#designTop-8" y="0" x="0" />
+          <use height="100%" width="100%" id="top5-2" xlink:href="#designTop-8" y="0" x="0" />
+          <use height="100%" width="100%" id="top6-0" transform="translate(256)" xlink:href="#designTop-8" y="0" x="0" />
+          <use height="100%" width="100%" id="top7-4" transform="translate(-256,256)" xlink:href="#designTop-8" y="0" x="0" />
+          <use height="100%" width="100%" id="top8-9" transform="translate(0,256)" xlink:href="#designTop-8" y="0" x="0" />
+          <use transform="translate(256,256)" height="100%" width="100%" id="top9-4" xlink:href="#designTop-8" y="0" x="0" />
+        </g>
+      </g>
+    </pattern>
+    <clipPath id="patternClipPath-7" clipPathUnits="userSpaceOnUse">
+      <rect style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ffff00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:20;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:1.0989;stroke-opacity:1;marker:none;enable-background:accumulate" id="clipPathRect-5" width="256" height="256" x="0" y="0" />
+    </clipPath>
+    </defs><g transform="matrix(1 0 0 1 -370.69635 -292.92749)"><rect style="display:inline;fill:url(#pattern9311);fill-opacity:1;stroke:none;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" id="rect5771-1" width="54.473976" height="78.778381" x="370.69635" y="292.92749" />
+  </g></svg>

@@ -87,6 +87,31 @@
     return index === 0 ? String(baseSeed) : `${baseSeed}#${index}`;
   }
 
+  function isCoarseMobile() {
+    return global.matchMedia('(pointer: coarse)').matches;
+  }
+
+  function yieldToMainThread() {
+    return new Promise((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(resolve));
+    });
+  }
+
+  function normalizeFindSettings(options) {
+    const settings = {
+      maxAttempts: 100,
+      maxBases: 25,
+      solveOptions: DEFAULT_OPTIONS,
+      filterProfile: null,
+      ...(options || {}),
+    };
+    if (isCoarseMobile()) {
+      settings.maxAttempts = Math.min(settings.maxAttempts, 24);
+      settings.maxBases = Math.min(settings.maxBases, 8);
+    }
+    return settings;
+  }
+
   async function solveGameString(gameString, options, logContext) {
     const wasm = await loadWasm();
     if (!wasm) {
@@ -186,19 +211,17 @@
   }
 
   async function findSolvableSeed(baseSeed, options) {
-    const settings = {
-      maxAttempts: 100,
-      maxBases: 25,
-      solveOptions: DEFAULT_OPTIONS,
-      filterProfile: null,
-      ...(options || {}),
-    };
+    const settings = normalizeFindSettings(options);
     const firstSeed = candidateSeed(baseSeed, 0);
     const needsProfile = typeof settings.filterProfile === 'function';
+    let attempts = 0;
 
     for (let b = 0; b < settings.maxBases; b++) {
       const base = b === 0 ? String(baseSeed) : `${String(baseSeed)}-d${b}`;
       for (let i = 0; i < settings.maxAttempts; i++) {
+        attempts += 1;
+        if (attempts % 2 === 0) await yieldToMainThread();
+
         const seed = candidateSeed(base, i);
         const engine = new global.SolitaireEngine(seed);
         const gameString = engine.getGameString();

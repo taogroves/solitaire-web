@@ -32,6 +32,8 @@
   let dealBenchmark = null;
   let fitBoardFrame = null;
   let boardResizeObserver = null;
+  let layoutModeFrame = null;
+  let boardFitGuard = false;
   const DIFFICULTY_STORAGE = 'solitaire-random-difficulty';
   let endgameCheckToken = 0;
   let endgameCheckTimer = null;
@@ -73,10 +75,15 @@
 
   function ensureDealProfileAsync(seedStr) {
     const seed = String(seedStr);
-    resolveDealProfile(seed, { pass: 'ensure-async' }).then((profile) => {
-      if (!engine || String(engine.seed) !== seed) return;
-      if (profile) applyDealProfile(profile);
-    });
+    const deferMs = window.matchMedia('(pointer: coarse)').matches ? 2500 : 0;
+    const run = () => {
+      resolveDealProfile(seed, { pass: 'ensure-async' }).then((profile) => {
+        if (!engine || String(engine.seed) !== seed) return;
+        if (profile) applyDealProfile(profile);
+      });
+    };
+    if (deferMs) setTimeout(run, deferMs);
+    else run();
   }
 
   function cacheEntryFromProfile(seed, profile) {
@@ -164,30 +171,42 @@
     if (fitBoardFrame) cancelAnimationFrame(fitBoardFrame);
     fitBoardFrame = requestAnimationFrame(() => {
       fitBoardFrame = null;
-      if (gameScreen.hidden) return;
+      if (gameScreen.hidden || boardFitGuard) return;
 
       const wrap = boardEl;
       const board = wrap?.querySelector('.solitaire-board');
       if (!wrap || !board) return;
 
-      wrap.style.marginBottom = '0';
-      board.style.setProperty('--board-scale', '1');
-      board.style.marginBottom = '0';
+      boardFitGuard = true;
+      try {
+        const availableH = wrap.clientHeight;
+        const availableW = wrap.clientWidth;
+        if (!availableH || !availableW) return;
 
-      const availableH = wrap.clientHeight;
-      const availableW = wrap.clientWidth;
-      const neededH = board.offsetHeight;
-      const neededW = board.offsetWidth;
-      if (!availableH || !availableW || !neededH || !neededW) return;
+        board.style.setProperty('--board-scale', '1');
+        wrap.style.marginBottom = '0';
 
-      const widthBuffer = 6;
-      const scale = Math.min(1, availableH / neededH, (availableW - widthBuffer) / neededW);
-      if (scale >= 0.999) return;
+        const neededH = board.offsetHeight;
+        const neededW = board.offsetWidth;
+        if (!neededH || !neededW) return;
 
-      const clamped = Math.max(0.5, scale);
-      board.style.setProperty('--board-scale', String(clamped));
-      const excess = Math.round(neededH * (1 - clamped));
-      wrap.style.marginBottom = excess > 0 ? `-${excess}px` : '0';
+        const widthBuffer = 6;
+        const scale = Math.min(1, availableH / neededH, (availableW - widthBuffer) / neededW);
+        if (scale >= 0.999) return;
+
+        const clamped = Math.max(0.5, scale);
+        const scaleStr = String(clamped);
+        const excess = Math.round(neededH * (1 - clamped));
+        const marginStr = excess > 0 ? `-${excess}px` : '0';
+        const prevScale = board.style.getPropertyValue('--board-scale');
+        const prevMargin = wrap.style.marginBottom;
+        if (prevScale === scaleStr && prevMargin === marginStr) return;
+
+        board.style.setProperty('--board-scale', scaleStr);
+        wrap.style.marginBottom = marginStr;
+      } finally {
+        boardFitGuard = false;
+      }
     });
   }
 
@@ -202,12 +221,12 @@
   }
 
   function ensureBoardResizeObserver() {
-    if (boardResizeObserver || !boardEl) return;
-    boardResizeObserver = new ResizeObserver(() => fitGameBoard());
-    boardResizeObserver.observe(boardEl);
-    const actionsEl = document.getElementById('game-actions');
-    if (actionsEl) boardResizeObserver.observe(actionsEl);
-    if (gameScreen) boardResizeObserver.observe(gameScreen);
+    if (boardResizeObserver || !gameScreen) return;
+    boardResizeObserver = new ResizeObserver(() => {
+      if (gameScreen.hidden) return;
+      fitGameBoard();
+    });
+    boardResizeObserver.observe(gameScreen);
   }
 
   function updateUndoButton() {
@@ -283,6 +302,7 @@
     const boardJson = engine.getBoardStateJson();
     endgameChecking = true;
     updateAutoCompleteButton();
+    await yieldToPaint();
 
     try {
       const result = await SolitaireSolver.solveBoardState(boardJson, null, {
@@ -342,12 +362,16 @@
   }
 
   function updateLayoutMode() {
-    const landscape = PHONE_LANDSCAPE.matches;
-    const onGame = gameScreen && !gameScreen.hidden;
-    document.body.classList.toggle('phone-landscape', landscape);
-    document.body.classList.toggle('game-landscape', landscape && onGame);
-    appEl?.classList.toggle('phone-landscape', landscape);
-    if (onGame) fitGameBoard();
+    if (layoutModeFrame) cancelAnimationFrame(layoutModeFrame);
+    layoutModeFrame = requestAnimationFrame(() => {
+      layoutModeFrame = null;
+      const landscape = PHONE_LANDSCAPE.matches;
+      const onGame = gameScreen && !gameScreen.hidden;
+      document.body.classList.toggle('phone-landscape', landscape);
+      document.body.classList.toggle('game-landscape', landscape && onGame);
+      appEl?.classList.toggle('phone-landscape', landscape);
+      if (onGame) fitGameBoard();
+    });
   }
 
   function showScreen(screen) {
@@ -642,6 +666,8 @@
       tier ? `Finding a ${tier.label.toLowerCase()} deal…` : 'Finding a solvable deal…'
     );
     await yieldToPaint();
+    await SolitaireSolver.loadWasm();
+    await yieldToPaint();
     try {
       if (isRandom && difficultyId && window.SolitaireSeedLibrary) {
         const libraryHit = SolitaireSeedLibrary.next(difficultyId);
@@ -734,6 +760,8 @@
 
     resolvingDeal = true;
     showSolverLoading('Calculating optimal solution…');
+    await yieldToPaint();
+    await SolitaireSolver.loadWasm();
     await yieldToPaint();
     try {
       const profile = await resolveDealProfile(key, { pass: 'seeded-start' });
@@ -987,9 +1015,22 @@
     { passive: false }
   );
 
+  function warmSolver() {
+    SolitaireSolver.loadWasm();
+  }
+
+  function scheduleSolverWarm() {
+    if (typeof requestIdleCallback === 'function') {
+      requestIdleCallback(warmSolver, { timeout: 5000 });
+      return;
+    }
+    setTimeout(warmSolver, 2000);
+  }
+
   CardAssets.preload().then(() => buildAppearancePickers());
   initDifficultyPicker();
-  SolitaireSolver.loadWasm();
+  menuScreen?.addEventListener('pointerdown', warmSolver, { once: true, passive: true });
+  scheduleSolverWarm();
   window.addEventListener('resize', fitGameBoard);
   window.visualViewport?.addEventListener('resize', fitGameBoard);
   PHONE_LANDSCAPE.addEventListener('change', updateLayoutMode);

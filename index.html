@@ -21,12 +21,6 @@
     </header>
 
     <div class="mode-cards">
-      <button type="button" class="mode-card" id="btn-appearance">
-        <span class="mode-icon" aria-hidden="true">🃏</span>
-        <h2>Card appearance</h2>
-        <p>Choose standard faces, back design, and back color.</p>
-      </button>
-
       <div class="mode-card mode-card-random" id="random-deal-card">
         <span class="mode-icon" aria-hidden="true">🎲</span>
         <div class="random-deal-row">
@@ -55,10 +49,17 @@
         <h2>Play by seed</h2>
         <p>Enter any word or phrase to replay an exact layout.</p>
         <div class="seed-row">
-          <input type="text" id="seed-input" placeholder="e.g. lucky-7 or 2026-05-23" autocomplete="off" spellcheck="false" />
+          <input type="text" id="seed-input" placeholder="e.g. lucky-7 or borborygmus" autocomplete="off" spellcheck="false" />
           <button type="button" class="btn btn-primary" id="btn-seed">Deal</button>
         </div>
       </div>
+    </div>
+
+    <div class="menu-appearance-wrap">
+      <button type="button" class="btn btn-secondary btn-appearance-menu" id="btn-appearance">
+        <span class="btn-appearance-icon" aria-hidden="true">🃏</span>
+        Card appearance
+      </button>
     </div>
 
     <p class="hint">Double-tap a card to send it to a foundation. Drag stacks on the tableau.</p>
@@ -98,27 +99,46 @@
   <div id="game-screen" class="screen screen-game" hidden>
     <header class="game-header">
       <button type="button" class="btn btn-ghost" id="btn-menu" aria-label="Menu">☰</button>
-      <div class="game-title-wrap">
+      <button type="button" class="game-title-wrap game-title-btn" id="btn-game-title" aria-label="Return to menu">
         <h1 class="game-title">For Mary <3</h1>
         <div class="game-subtitle" id="game-subtitle">
           <div class="game-subtitle-mode" id="game-subtitle-mode"></div>
-          <div class="game-subtitle-seed-row">
-            <span class="game-subtitle-seed" id="game-subtitle-seed"></span>
+          <div class="game-subtitle-seed" id="game-subtitle-seed"></div>
+        </div>
+      </button>
+      <div class="stats">
+        <div class="stat stat-time">
+          <span class="stat-label">Time</span>
+          <div class="stat-time-body">
             <span class="difficulty-badge" id="game-difficulty-badge" aria-hidden="true"></span>
+            <span class="stat-value" id="timer-display">0:00</span>
           </div>
         </div>
-      </div>
-      <div class="stats">
-        <div class="stat"><span class="stat-label">Time</span><span class="stat-value" id="timer-display">0:00</span></div>
         <div class="stat"><span class="stat-label">Moves</span><span class="stat-value" id="moves-display">0</span></div>
       </div>
       <button type="button" class="btn btn-ghost btn-mute" id="btn-mute" aria-label="Toggle sound" aria-pressed="false">🔊</button>
     </header>
 
+    <div class="game-actions" id="game-actions">
+      <button type="button" class="btn btn-ghost btn-undo" id="btn-undo" aria-label="Undo last move" disabled>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+          <path d="M3 3v5h5" />
+        </svg>
+        <span class="btn-undo-label">Undo</span>
+      </button>
+      <button type="button" class="btn btn-primary btn-auto-complete" id="btn-auto-complete" hidden>
+        Auto-complete
+      </button>
+    </div>
+
     <main id="game-board" class="game-board-wrap" aria-label="Solitaire board"></main>
 
     <footer class="game-footer">
-      <button type="button" class="btn btn-secondary" id="btn-new-game">New deal</button>
+      <div class="game-footer-actions">
+        <button type="button" class="btn btn-secondary" id="btn-replay-deal">Replay deal</button>
+        <button type="button" class="btn btn-secondary" id="btn-new-game">New deal</button>
+      </div>
     </footer>
   </div>
   </div><!-- #app -->
@@ -137,9 +157,12 @@
       <h2 id="win-title" class="modal-title">You win!</h2>
       <p id="win-sub" class="modal-sub">Brilliant play.</p>
       <dl class="win-stats">
+        <div><dt>Score</dt><dd id="win-score" class="win-score-value">—</dd></div>
+        <div><dt>Best</dt><dd id="win-best-score">100</dd></div>
         <div><dt>Time</dt><dd id="win-time">0:00</dd></div>
-        <div><dt>Your moves</dt><dd id="win-moves">0</dd></div>
-        <div><dt>Optimal</dt><dd id="win-optimal">—</dd></div>
+        <div><dt>Moves</dt><dd id="win-moves">0</dd></div>
+        <div><dt>Solver par</dt><dd id="win-par-moves">—</dd></div>
+        <div><dt>Par time</dt><dd id="win-par-time">—</dd></div>
         <div class="win-stat-full">
           <dt>Seed</dt>
           <dd id="win-seed-row" class="win-seed-row">
@@ -150,8 +173,11 @@
       </dl>
       <p id="win-message" class="win-message" hidden></p>
       <div class="modal-actions">
-        <button type="button" class="btn btn-primary" id="win-try-again">Try again</button>
-        <button type="button" class="btn btn-secondary" id="win-new-deal">New deal</button>
+        <div class="modal-actions-row">
+          <button type="button" class="btn btn-primary" id="win-replay">Replay deal</button>
+          <button type="button" class="btn btn-secondary" id="win-new-deal">New deal</button>
+        </div>
+        <button type="button" class="btn btn-secondary" id="win-share">Share</button>
         <button type="button" class="btn btn-ghost" id="win-to-menu">Main menu</button>
       </div>
     </div>
@@ -160,10 +186,13 @@
   <script src="js/seedrandom.min.js"></script>
   <script src="js/engine.js"></script>
   <script src="js/difficulty.js"></script>
+  <script src="js/score.js"></script>
   <script src="js/seed-library.js"></script>
   <script src="js/cards.js"></script>
   <script src="js/audio.js"></script>
+  <script src="js/celebration.js"></script>
   <script src="js/ui.js"></script>
+  <script src="js/solver-moves.js"></script>
   <script src="js/solver.js"></script>
   <script src="js/deal-cache.js"></script>
   <script src="js/app.js"></script>

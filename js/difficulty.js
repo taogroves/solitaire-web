@@ -64,12 +64,15 @@
   }
 
   function fromCacheEntry(entry) {
-    if (!entry || entry.optimal == null) return fromSolveResult(null);
+    if (!entry) return fromSolveResult(null);
+    const moves = entry.best_known ?? entry.bestKnown ?? entry.optimal;
+    if (moves == null) return fromSolveResult(null);
     return fromSolveResult({
       solved: true,
-      move_count: entry.optimal,
+      move_count: moves,
+      minimal: entry.optimal != null,
       states: entry.minimal_states ?? entry.minimalStates ?? 0,
-      first_solution_moves: entry.first_moves ?? entry.firstMoves ?? entry.optimal,
+      first_solution_moves: entry.first_moves ?? entry.firstMoves ?? moves,
       first_solution_states: entry.first_states ?? entry.firstStates ?? 0,
       move_gap: entry.move_gap ?? entry.moveGap ?? 0,
     });
@@ -117,11 +120,20 @@
   }
 
   function profileToCacheFields(profile) {
-    if (!profile || profile.optimal == null) {
-      return { optimal: null, minimal_states: null, first_states: null, move_gap: null, score: null };
+    const bestKnown = profile ? profile.bestKnown ?? profile.optimal : null;
+    if (!profile || bestKnown == null) {
+      return {
+        optimal: null,
+        best_known: null,
+        minimal_states: null,
+        first_states: null,
+        move_gap: null,
+        score: null,
+      };
     }
     return {
       optimal: profile.optimal,
+      best_known: bestKnown,
       minimal_states: profile.minimalStates,
       first_states: profile.firstStates,
       move_gap: profile.moveGap,

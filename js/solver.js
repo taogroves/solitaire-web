@@ -20,6 +20,13 @@
     terminate_early: false,
   };
 
+  const ENDGAME_OPTIONS = {
+    max_states: 40000,
+    max_moves: 120,
+    max_recycles: 15,
+    terminate_early: true,
+  };
+
   const moduleUrl = new URL('../wasm/pkg/solitaire_solver.js', document.currentScript.src).href;
   let wasmPromise = null;
 
@@ -108,8 +115,7 @@
   }
 
   /**
-   * Use the fast solver for deal selection. Ask for a minimal proof only in contexts
-   * that truly need an optimal comparison, such as the win modal.
+   * Solver profile for deal load (quick). Minimal proof is optional elsewhere only.
    */
   async function resolveProfileForGameString(gameString, context, quickResult) {
     const ctx = context || {};
@@ -243,13 +249,41 @@
     return solveGameString(gameString, { ...MINIMAL_OPTIONS, ...(options || {}) }, logContext);
   }
 
+  async function solveBoardState(boardJson, options, logContext) {
+    const wasm = await loadWasm();
+    if (!wasm || typeof wasm.solve_board_state_json !== 'function') {
+      const unavailable = { solved: false, status: 'unavailable', moves: [] };
+      logSolver('solve-board-unavailable', logContext || {}, boardJson, unavailable);
+      return unavailable;
+    }
+
+    const merged = { ...ENDGAME_OPTIONS, ...(options || {}) };
+    let result;
+    try {
+      const json = wasm.solve_board_state_json(boardJson, JSON.stringify(merged));
+      result = JSON.parse(json);
+    } catch (err) {
+      console.error(LOG_PREFIX, {
+        event: 'solve-board-parse-error',
+        ...(logContext || {}),
+        error: String(err),
+      });
+      return { solved: false, status: 'invalid', error: String(err), moves: [] };
+    }
+
+    logSolver('solve-board', { ...(logContext || {}), options: merged }, boardJson, result);
+    return result;
+  }
+
   global.SolitaireSolver = {
     loadWasm,
     solveGameString,
     solveMinimal,
+    solveBoardState,
     resolveProfileForGameString,
     resolveProfileForSeed,
     findSolvableSeed,
     summarizeResult,
+    ENDGAME_OPTIONS,
   };
 })(typeof window !== 'undefined' ? window : global);

@@ -27,17 +27,29 @@
   let resolvingDeal = false;
   let optimalMoveCount = null;
   let dealProfile = null;
+  let dealBenchmark = null;
+  let fitBoardFrame = null;
+  let boardResizeObserver = null;
   const DIFFICULTY_STORAGE = 'solitaire-random-difficulty';
+  let endgameCheckToken = 0;
+  let endgameCheckTimer = null;
+  let endgameSolution = null;
+  let endgameChecking = false;
 
   function applyDealProfile(profile) {
     dealProfile = profile && profile.label ? profile : null;
     optimalMoveCount =
       dealProfile && dealProfile.optimal != null ? dealProfile.optimal : null;
+    dealBenchmark = ScoreBenchmark.computeBenchmark(dealProfile);
     refreshDifficultyBadges();
   }
 
+  function shouldShowDifficultyBadge() {
+    return currentMode !== 'Seeded';
+  }
+
   function refreshDifficultyBadges() {
-    const profile = getDisplayProfile();
+    const profile = shouldShowDifficultyBadge() ? getDisplayProfile() : null;
     DealDifficulty.setBadgeElement(subtitleBadgeEl, profile);
     DealDifficulty.setBadgeElement(winBadgeEl, profile);
   }
@@ -135,7 +147,8 @@
 
   function updateWinSeedRow(seed, profile) {
     if (winSeedTextEl) winSeedTextEl.textContent = seed || '—';
-    DealDifficulty.setBadgeElement(winBadgeEl, profile || getDisplayProfile());
+    const badgeProfile = shouldShowDifficultyBadge() ? profile || getDisplayProfile() : null;
+    DealDifficulty.setBadgeElement(winBadgeEl, badgeProfile);
   }
 
   function stopTimer() {
@@ -143,6 +156,164 @@
       clearInterval(timerId);
       timerId = null;
     }
+  }
+
+  function fitGameBoard() {
+    if (fitBoardFrame) cancelAnimationFrame(fitBoardFrame);
+    fitBoardFrame = requestAnimationFrame(() => {
+      fitBoardFrame = null;
+      if (gameScreen.hidden) return;
+
+      const wrap = boardEl;
+      const board = wrap?.querySelector('.solitaire-board');
+      if (!wrap || !board) return;
+
+      board.style.setProperty('--board-scale', '1');
+      board.style.marginBottom = '0';
+
+      const availableH = wrap.clientHeight;
+      const availableW = wrap.clientWidth;
+      const neededH = board.offsetHeight;
+      const neededW = board.offsetWidth;
+      if (!availableH || !availableW || !neededH || !neededW) return;
+
+      const scale = Math.min(1, availableH / neededH, availableW / neededW);
+      if (scale >= 0.999) return;
+
+      const clamped = Math.max(0.5, scale);
+      board.style.setProperty('--board-scale', String(clamped));
+      board.style.marginBottom = `${Math.round(neededH * (clamped - 1))}px`;
+    });
+  }
+
+  function ensureBoardResizeObserver() {
+    if (boardResizeObserver || !boardEl) return;
+    boardResizeObserver = new ResizeObserver(() => fitGameBoard());
+    boardResizeObserver.observe(boardEl);
+    const actionsEl = document.getElementById('game-actions');
+    if (actionsEl) boardResizeObserver.observe(actionsEl);
+    if (gameScreen) boardResizeObserver.observe(gameScreen);
+  }
+
+  function updateUndoButton() {
+    const btn = document.getElementById('btn-undo');
+    if (!btn) return;
+    if (engine?.isWon()) {
+      btn.hidden = true;
+      updateAutoCompleteButton();
+      return;
+    }
+    btn.hidden = false;
+    const canUndo = Boolean(engine?.canUndo()) && !ui?.animating;
+    btn.disabled = !canUndo;
+    btn.setAttribute('aria-disabled', String(!canUndo));
+    updateAutoCompleteButton();
+    fitGameBoard();
+  }
+
+  function updateAutoCompleteButton() {
+    const btn = document.getElementById('btn-auto-complete');
+    if (!btn) return;
+    const show =
+      Boolean(endgameSolution?.length) &&
+      !engine?.isWon() &&
+      !ui?.animating &&
+      !endgameChecking;
+    btn.hidden = !show;
+    btn.disabled = !show;
+    btn.setAttribute('aria-disabled', String(!show));
+    if (endgameChecking && !engine?.isWon() && engine?.allTableauFaceUp?.()) {
+      btn.hidden = false;
+      btn.disabled = true;
+      btn.textContent = 'Checking…';
+    } else {
+      btn.textContent = 'Auto-complete';
+    }
+    fitGameBoard();
+  }
+
+  function clearEndgameState() {
+    endgameCheckToken += 1;
+    endgameSolution = null;
+    endgameChecking = false;
+    if (endgameCheckTimer) {
+      clearTimeout(endgameCheckTimer);
+      endgameCheckTimer = null;
+    }
+    updateAutoCompleteButton();
+  }
+
+  function scheduleEndgameCheck() {
+    if (!engine || engine.isWon() || !engine.allTableauFaceUp()) {
+      clearEndgameState();
+      return;
+    }
+    if (endgameCheckTimer) clearTimeout(endgameCheckTimer);
+    endgameCheckTimer = setTimeout(() => {
+      endgameCheckTimer = null;
+      checkEndgameSolvability();
+    }, 120);
+  }
+
+  async function checkEndgameSolvability() {
+    if (!engine || engine.isWon() || !engine.allTableauFaceUp()) {
+      clearEndgameState();
+      return;
+    }
+
+    const token = ++endgameCheckToken;
+    const boardJson = engine.getBoardStateJson();
+    endgameChecking = true;
+    updateAutoCompleteButton();
+
+    try {
+      const result = await SolitaireSolver.solveBoardState(boardJson, null, {
+        pass: 'endgame-check',
+        seed: engine.seed,
+      });
+      if (token !== endgameCheckToken) return;
+      endgameSolution = result.solved && result.moves?.length ? result.moves.slice() : null;
+    } catch (err) {
+      if (token !== endgameCheckToken) return;
+      console.warn('[solitaire]', { event: 'endgame-check-failed', error: String(err) });
+      endgameSolution = null;
+    } finally {
+      if (token === endgameCheckToken) {
+        endgameChecking = false;
+        updateAutoCompleteButton();
+      }
+    }
+  }
+
+  async function startAutoComplete() {
+    if (!endgameSolution?.length || !ui || ui.animating || engine?.isWon()) return;
+    const moves = endgameSolution.slice();
+    clearEndgameState();
+    await ui.playSolverMoves(moves);
+    updateUndoButton();
+  }
+
+  function performUndo() {
+    if (!engine?.canUndo() || engine.isWon() || ui?.animating) return;
+    const result = engine.undo();
+    if (!result.ok) return;
+    SolitaireAudio.undo();
+    clearEndgameState();
+    if (ui) {
+      ui.render();
+      ui.updateMoves(engine.moves);
+    }
+    updateUndoButton();
+    scheduleEndgameCheck();
+  }
+
+  function goToMenu() {
+    SolitaireAudio.uiClick();
+    stopTimer();
+    hideWinModal();
+    clearEndgameState();
+    if (ui) ui.cancelInteraction();
+    showScreen('menu');
   }
 
   function startTimer() {
@@ -160,6 +331,7 @@
     if (screen === 'game') {
       window.scrollTo(0, 0);
       gameScreen.scrollTop = 0;
+      fitGameBoard();
     }
     if (screen === 'settings') {
       settingsScreen.scrollTop = 0;
@@ -350,6 +522,7 @@
     if (!keepOptimal) {
       optimalMoveCount = null;
       dealProfile = null;
+      dealBenchmark = null;
     }
     engine = new SolitaireEngine(seedStr);
     currentMode = modeLabel || 'Random';
@@ -358,16 +531,35 @@
       ui = new GameUI(boardEl, engine, {
         onMove() {
           ui.updateMoves(engine.moves);
+          clearEndgameState();
+          updateUndoButton();
+          scheduleEndgameCheck();
         },
         onWin() {
           stopTimer();
+          clearEndgameState();
           showWinModal();
         },
+        onLayout: fitGameBoard,
       });
     } else {
       ui.setEngine(engine);
+      ui.onMove = () => {
+        ui.updateMoves(engine.moves);
+        clearEndgameState();
+        updateUndoButton();
+        scheduleEndgameCheck();
+      };
+      ui.onWin = () => {
+        stopTimer();
+        clearEndgameState();
+        showWinModal();
+      };
+      ui.onLayout = fitGameBoard;
       boardEl.classList.remove('game-won');
     }
+
+    clearEndgameState();
 
     updateGameSubtitle(seedStr, currentMode);
     if (!dealProfile && !(options && options.skipProfileResolve)) {
@@ -377,6 +569,9 @@
     ui.updateMoves(0);
     ui.updateTimer(0);
     ui.render();
+    updateUndoButton();
+    ensureBoardResizeObserver();
+    fitGameBoard();
     showScreen('game');
     startTimer();
     SolitaireAudio.newDeal();
@@ -527,45 +722,65 @@
     }
   }
 
-  function setWinComparison(playerMoves, optimal) {
+  function setWinScoreDisplay(playerMoves, playerTimeMs) {
     const titleEl = document.getElementById('win-title');
     const subEl = document.getElementById('win-sub');
     const messageEl = document.getElementById('win-message');
     const movesEl = document.getElementById('win-moves');
-    const optimalEl = document.getElementById('win-optimal');
+    const scoreEl = document.getElementById('win-score');
+    const bestScoreEl = document.getElementById('win-best-score');
+    const parMovesEl = document.getElementById('win-par-moves');
+    const parTimeEl = document.getElementById('win-par-time');
 
-    optimalEl.textContent = optimal == null ? '—' : String(optimal);
     movesEl.classList.remove('win-moves-optimal', 'win-moves-over');
 
-    if (optimal == null) {
+    if (!dealBenchmark) {
       titleEl.textContent = 'You win!';
       subEl.textContent = 'Brilliant play.';
       messageEl.hidden = true;
       messageEl.textContent = '';
+      if (scoreEl) scoreEl.textContent = '—';
+      if (bestScoreEl) bestScoreEl.textContent = '—';
+      if (parMovesEl) parMovesEl.textContent = '—';
+      if (parTimeEl) parTimeEl.textContent = '—';
       return;
     }
 
-    const extra = playerMoves - optimal;
-    if (extra <= 0) {
-      titleEl.textContent = 'Perfect!';
-      subEl.textContent = 'You found the optimal solution.';
-      movesEl.classList.add('win-moves-optimal');
+    const playerScore = ScoreBenchmark.computePlayerScore(
+      playerMoves,
+      playerTimeMs,
+      dealBenchmark
+    );
+    const summary = ScoreBenchmark.winSummary(
+      playerScore,
+      dealBenchmark,
+      playerMoves,
+      playerTimeMs
+    );
+
+    titleEl.textContent = summary.title;
+    subEl.textContent = summary.sub;
+    if (summary.message) {
+      messageEl.hidden = false;
+      messageEl.textContent = summary.message;
+    } else {
       messageEl.hidden = true;
       messageEl.textContent = '';
-      return;
     }
 
-    titleEl.textContent = 'You win!';
-    subEl.textContent =
-      extra === 1
-        ? `One move over optimal — can you match ${optimal}?`
-        : `${extra} moves over optimal — can you beat ${optimal}?`;
-    movesEl.classList.add('win-moves-over');
-    messageEl.hidden = false;
-    messageEl.textContent = `You used ${playerMoves} moves; the solver needs only ${optimal}.`;
+    if (scoreEl) scoreEl.textContent = String(playerScore);
+    if (bestScoreEl) bestScoreEl.textContent = String(dealBenchmark.bestScore);
+    if (parMovesEl) parMovesEl.textContent = String(dealBenchmark.bestMoves);
+    if (parTimeEl) parTimeEl.textContent = ScoreBenchmark.formatTimeMs(dealBenchmark.bestTimeMs);
+
+    if (playerMoves <= dealBenchmark.bestMoves) {
+      movesEl.classList.add('win-moves-optimal');
+    } else {
+      movesEl.classList.add('win-moves-over');
+    }
   }
 
-  async function showWinModal() {
+  function showWinModal() {
     const ms = engine.elapsedMs();
     const sec = Math.floor(ms / 1000);
     const m = Math.floor(sec / 60);
@@ -575,35 +790,69 @@
     document.getElementById('win-time').textContent = `${m}:${String(s).padStart(2, '0')}`;
     document.getElementById('win-moves').textContent = String(playerMoves);
     updateWinSeedRow(engine.seed || '—', getDisplayProfile());
-    document.getElementById('win-optimal').textContent = '…';
-    document.getElementById('win-message').hidden = true;
-    document.getElementById('win-sub').textContent = 'Checking your score…';
-    document.getElementById('win-title').textContent = 'You win!';
-    document.getElementById('win-moves').classList.remove('win-moves-optimal', 'win-moves-over');
+    setWinScoreDisplay(playerMoves, ms);
+    updateUndoButton();
 
     winModal.hidden = false;
     winModal.classList.add('modal-visible');
-
-    let optimal = optimalMoveCount;
-    if (dealProfile == null || dealProfile.optimal == null) {
-      const profile = await resolveDealProfile(engine.seed, { pass: 'win-modal', requireMinimal: true });
-      if (profile) applyDealProfile(profile);
-      optimal = dealProfile && dealProfile.optimal != null ? dealProfile.optimal : optimal;
-      if (currentMode === 'Seeded' && engine?.seed && dealProfile) {
-        saveSeededCache(engine.seed, engine.seed, dealProfile);
-      }
-      if (currentMode === 'Daily' && engine?.seed && dealProfile) {
-        saveDailyCache(SolitaireDailySeed(), engine.seed, dealProfile);
-      }
-    }
-
-    updateWinSeedRow(engine.seed || '—', getDisplayProfile());
-    setWinComparison(playerMoves, optimal);
+    if (window.SolitaireCelebration) window.SolitaireCelebration.celebrate();
   }
 
   function hideWinModal() {
     winModal.hidden = true;
     winModal.classList.remove('modal-visible');
+    if (window.SolitaireCelebration) window.SolitaireCelebration.stop();
+  }
+
+  function buildWinShareText() {
+    const time = document.getElementById('win-time').textContent;
+    const score = document.getElementById('win-score').textContent;
+    const seed = String(engine?.seed || '');
+    let dealLine;
+    if (currentMode === 'Daily') {
+      const datePart = /^\d{4}-\d{2}-\d{2}/.test(seed) ? seed.slice(0, 10) : SolitaireDailySeed();
+      dealLine = `Daily: ${SolitaireFormatDate(datePart)}`;
+    } else {
+      dealLine = `Seed: ${seed || '—'}`;
+    }
+    return `${dealLine}\nTime: ${time}\nScore: ${score}`;
+  }
+
+  async function copyWinShare() {
+    const text = buildWinShareText();
+    const shareBtn = document.getElementById('win-share');
+    const originalLabel = shareBtn.textContent;
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.select();
+        if (!document.execCommand('copy')) throw new Error('copy failed');
+        document.body.removeChild(textarea);
+      }
+      shareBtn.textContent = 'Copied!';
+    } catch {
+      shareBtn.textContent = 'Copy failed';
+    }
+
+    window.setTimeout(() => {
+      shareBtn.textContent = originalLabel;
+    }, 2000);
+  }
+
+  function replaySameDeal() {
+    hideWinModal();
+    if (!engine?.seed) return;
+    if (currentMode === 'Seeded') startSeededGame(engine.seed);
+    else if (currentMode === 'Daily') startSolvableGame(SolitaireDailySeed(), 'Daily');
+    else startGame(engine.seed, currentMode, { keepOptimal: true });
   }
 
   document.getElementById('btn-appearance').addEventListener('click', () => {
@@ -650,11 +899,22 @@
     if (e.key === 'Enter') document.getElementById('btn-seed').click();
   });
 
-  document.getElementById('btn-menu').addEventListener('click', () => {
+  document.getElementById('btn-undo').addEventListener('click', () => {
+    performUndo();
+  });
+
+  document.getElementById('btn-auto-complete').addEventListener('click', () => {
     SolitaireAudio.uiClick();
-    stopTimer();
-    hideWinModal();
-    showScreen('menu');
+    startAutoComplete();
+  });
+
+  document.getElementById('btn-menu').addEventListener('click', goToMenu);
+
+  document.getElementById('btn-game-title').addEventListener('click', goToMenu);
+
+  document.getElementById('btn-replay-deal').addEventListener('click', () => {
+    SolitaireAudio.uiClick();
+    replaySameDeal();
   });
 
   document.getElementById('btn-new-game').addEventListener('click', () => {
@@ -673,13 +933,9 @@
     btn.setAttribute('aria-pressed', String(next));
   });
 
-  document.getElementById('win-try-again').addEventListener('click', () => {
+  document.getElementById('win-replay').addEventListener('click', () => {
     SolitaireAudio.uiClick();
-    hideWinModal();
-    if (!engine?.seed) return;
-    if (currentMode === 'Seeded') startSeededGame(engine.seed);
-    else if (currentMode === 'Daily') startSolvableGame(SolitaireDailySeed(), 'Daily');
-    else startGame(engine.seed, currentMode, { keepOptimal: true });
+    replaySameDeal();
   });
 
   document.getElementById('win-new-deal').addEventListener('click', () => {
@@ -688,11 +944,12 @@
     document.getElementById('btn-new-game').click();
   });
 
-  document.getElementById('win-to-menu').addEventListener('click', () => {
+  document.getElementById('win-share').addEventListener('click', () => {
     SolitaireAudio.uiClick();
-    hideWinModal();
-    document.getElementById('btn-menu').click();
+    copyWinShare();
   });
+
+  document.getElementById('win-to-menu').addEventListener('click', goToMenu);
 
   document.body.addEventListener(
     'touchmove',
@@ -705,5 +962,6 @@
   CardAssets.preload().then(() => buildAppearancePickers());
   initDifficultyPicker();
   SolitaireSolver.loadWasm();
+  window.addEventListener('resize', fitGameBoard);
   showScreen('menu');
 })();

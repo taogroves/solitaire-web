@@ -56,6 +56,8 @@
     return null;
   }
 
+  const MAX_UNDO_HISTORY = 200;
+
   class SolitaireEngine {
     constructor(seed) {
       this.seed = seed || null;
@@ -64,6 +66,7 @@
       this.stockPasses = 0;
       this.startedAt = null;
       this.wonAt = null;
+      this._history = [];
       this._newDeal(seed);
     }
 
@@ -98,6 +101,46 @@
       this.startedAt = Date.now();
       this.wonAt = null;
       this.seed = seed == null ? null : String(seed);
+      this._history = [];
+    }
+
+    _snapshot() {
+      return {
+        tableau: this.tableau.map((pile) => pile.map((card) => ({ ...card }))),
+        stock: this.stock.map((card) => ({ ...card })),
+        waste: this.waste.map((card) => ({ ...card })),
+        foundationRanks: [...this.foundationRanks],
+        foundationTops: this.foundationTops.map((card) => (card ? { ...card } : null)),
+        moves: this.moves,
+        stockPasses: this.stockPasses,
+        wonAt: this.wonAt,
+      };
+    }
+
+    _restore(snapshot) {
+      this.tableau = snapshot.tableau.map((pile) => pile.map((card) => ({ ...card })));
+      this.stock = snapshot.stock.map((card) => ({ ...card }));
+      this.waste = snapshot.waste.map((card) => ({ ...card }));
+      this.foundationRanks = [...snapshot.foundationRanks];
+      this.foundationTops = snapshot.foundationTops.map((card) => (card ? { ...card } : null));
+      this.moves = snapshot.moves;
+      this.stockPasses = snapshot.stockPasses;
+      this.wonAt = snapshot.wonAt;
+    }
+
+    _pushHistory() {
+      this._history.push(this._snapshot());
+      if (this._history.length > MAX_UNDO_HISTORY) this._history.shift();
+    }
+
+    canUndo() {
+      return this._history.length > 0;
+    }
+
+    undo() {
+      if (!this.canUndo()) return { ok: false, reason: 'empty' };
+      this._restore(this._history.pop());
+      return { ok: true };
     }
 
     newGame(seed) {
@@ -137,6 +180,26 @@
       return this.foundationRanks.every((n) => n === 13);
     }
 
+    allTableauFaceUp() {
+      return this.tableau.every((pile) => pile.every((card) => card.faceUp));
+    }
+
+    getBoardStateJson() {
+      return JSON.stringify({
+        tableau: this.tableau.map((pile) =>
+          pile.map((card) => ({
+            suit: card.suit,
+            rank: card.rank,
+            face_up: card.faceUp,
+          }))
+        ),
+        stock: this.stock.map((card) => ({ suit: card.suit, rank: card.rank })),
+        waste: this.waste.map((card) => ({ suit: card.suit, rank: card.rank })),
+        foundations: [...this.foundationRanks],
+        recycles: this.stockPasses,
+      });
+    }
+
     stockRemaining() {
       return this.stock.length;
     }
@@ -148,6 +211,7 @@
     drawFromStock() {
       if (this.wonAt) return { ok: false, reason: 'won' };
       if (this.stock.length > 0) {
+        this._pushHistory();
         const n = Math.min(this.drawCount, this.stock.length);
         for (let i = 0; i < n; i++) {
           const card = this.stock.pop();
@@ -158,6 +222,7 @@
         return { ok: true, action: 'draw', count: n };
       }
       if (this.waste.length > 0) {
+        this._pushHistory();
         // Flip waste onto stock: top of waste becomes bottom of stock (drawn last
         // next pass); bottom of waste becomes stock top (pop end, drawn first).
         while (this.waste.length) {
@@ -241,6 +306,7 @@
         if (cards.length !== 1) return { ok: false, reason: 'multi_to_foundation' };
         const fIdx = dest.foundation != null ? dest.foundation : this.foundationIndexForSuit(card.suit);
         if (!this.canPlaceOnFoundation(card, fIdx)) return { ok: false, reason: 'illegal' };
+        this._pushHistory();
         this._removeFromSource(sourceMeta, cards);
         this.foundationRanks[fIdx]++;
         this.foundationTops[fIdx] = card;
@@ -253,6 +319,7 @@
       if (dest.type === 'tableau') {
         const col = dest.col;
         if (!this.canPlaceOnTableau(card, col)) return { ok: false, reason: 'illegal' };
+        this._pushHistory();
         this._removeFromSource(sourceMeta, cards);
         this.tableau[col].push(...cards);
         const flippedCardId = this._afterMove(sourceMeta);

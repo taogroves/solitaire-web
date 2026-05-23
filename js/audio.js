@@ -113,6 +113,16 @@
       notes.forEach((f, i) => tone(f, 0.14, 'triangle', 0.1, t0 + i * 0.07));
       tone(988, 0.22, 'sine', 0.09, t0 + 0.32);
     },
+    undo() {
+      resume();
+      const c = getCtx();
+      if (!c) return;
+      const t0 = c.currentTime;
+      tone(480, 0.05, 'sine', 0.1, t0);
+      tone(360, 0.07, 'triangle', 0.09, t0 + 0.04);
+      tone(240, 0.1, 'sine', 0.08, t0 + 0.09);
+      noiseBurst(0.03, 0.035);
+    },
   };
 
   global.SolitaireAudio = AudioFX;

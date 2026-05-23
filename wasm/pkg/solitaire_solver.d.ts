@@ -9,6 +9,8 @@ export function is_solvable_seed(seed: string, options_json?: string | null): bo
 
 export function normalize_game_string(game_string: string): string;
 
+export function solve_board_state_json(board_json: string, options_json?: string | null): string;
+
 export function solve_game_string(game_string: string, options_json?: string | null): string;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
@@ -18,6 +20,7 @@ export interface InitOutput {
     readonly first_solvable_seed: (a: number, b: number, c: number, d: number) => [number, number];
     readonly is_solvable_game_string: (a: number, b: number, c: number, d: number) => number;
     readonly normalize_game_string: (a: number, b: number) => [number, number, number, number];
+    readonly solve_board_state_json: (a: number, b: number, c: number, d: number) => [number, number];
     readonly solve_game_string: (a: number, b: number, c: number, d: number) => [number, number];
     readonly is_solvable_seed: (a: number, b: number, c: number, d: number) => number;
     readonly __wbindgen_externrefs: WebAssembly.Table;

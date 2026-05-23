@@ -4,6 +4,7 @@ export const memory: WebAssembly.Memory;
 export const first_solvable_seed: (a: number, b: number, c: number, d: number) => [number, number];
 export const is_solvable_game_string: (a: number, b: number, c: number, d: number) => number;
 export const normalize_game_string: (a: number, b: number) => [number, number, number, number];
+export const solve_board_state_json: (a: number, b: number, c: number, d: number) => [number, number];
 export const solve_game_string: (a: number, b: number, c: number, d: number) => [number, number];
 export const is_solvable_seed: (a: number, b: number, c: number, d: number) => number;
 export const __wbindgen_externrefs: WebAssembly.Table;

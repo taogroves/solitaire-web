@@ -4,8 +4,13 @@
 (function (global) {
   'use strict';
 
-  const TABLEAU_OVERLAP = 28;
-  const WASTE_FAN = 22; /* keep in sync with --waste-fan in styles.css */
+  const WASTE_FAN = 22;
+
+  function layoutPx(name, fallback) {
+    const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    const n = parseFloat(raw);
+    return Number.isFinite(n) ? n : fallback;
+  }
 
   function $(sel, root) {
     return (root || document).querySelector(sel);
@@ -24,6 +29,7 @@
       this.engine = engine;
       this.onWin = options.onWin || (() => {});
       this.onMove = options.onMove || (() => {});
+      this.onLayout = options.onLayout || (() => {});
       this.drag = null;
       this.selection = null;
       this.lastTap = { time: 0, key: '' };
@@ -91,6 +97,11 @@
       this.render();
     }
 
+    cancelInteraction() {
+      this.animating = false;
+      this._cancelDrag();
+    }
+
     render(options) {
       const gen = ++this._renderGen;
       const flipCardId =
@@ -101,6 +112,7 @@
       this._renderFoundations(s, gen);
       this._renderTableau(s, flipCardId, gen);
       this._updateStockBadge(s);
+      if (this.onLayout) this.onLayout();
     }
 
     _updateStockBadge(s) {
@@ -140,7 +152,7 @@
           isTop: offset + i === s.waste.length - 1,
         });
         if (gen !== this._renderGen) return;
-        node.style.setProperty('--fan', i * WASTE_FAN + 'px');
+        node.style.setProperty('--fan', `${i * layoutPx('--waste-fan', WASTE_FAN)}px`);
         node.style.zIndex = String(i + 1);
         if (!node.classList.contains('card-top-waste')) {
           node.style.pointerEvents = 'none';
@@ -170,8 +182,6 @@
         const colEl = this.tableauCols[c];
         colEl.innerHTML = '';
         const pile = s.tableau[c];
-        const depth = Math.max(0, pile.length - 1);
-        colEl.style.setProperty('--pile-depth', String(depth));
         for (let i = 0; i < pile.length; i++) {
           const card = pile[i];
           const node = this._cardNode(card, {
@@ -410,8 +420,49 @@
     _celebrateWin() {
       SolitaireAudio.win();
       this.board.classList.add('game-won');
-      this.onWin();
       this._spawnConfetti();
+      this.onWin();
+    }
+
+    async playSolverMoves(moves, options) {
+      const list = Array.isArray(moves) ? moves : [];
+      if (!list.length || this.animating) return { ok: false, reason: 'empty' };
+
+      const delayMs = (options && options.delayMs) || 280;
+      this.animating = true;
+      this._cancelDrag();
+
+      try {
+        for (const move of list) {
+          if (!this.animating) break;
+
+          const result = SolitaireSolverMoves.applySolverMove(this.engine, move);
+          if (!result.ok) {
+            console.error('[solitaire]', { event: 'auto-play-failed', move, result });
+            return { ok: false, reason: 'move_failed', move, result };
+          }
+
+          if (result.action === 'draw') SolitaireAudio.draw();
+          else if (result.action === 'recycle') SolitaireAudio.recycle();
+          else if (result.action !== 'talon_only') {
+            SolitaireAudio.place();
+            if (result.flippedCardId != null) SolitaireAudio.flip();
+          }
+
+          this.render({ flipCardId: result.flippedCardId ?? null });
+          this.onMove();
+
+          if (this.engine.isWon()) {
+            this._celebrateWin();
+            return { ok: true, won: true };
+          }
+
+          await new Promise((resolve) => setTimeout(resolve, delayMs));
+        }
+        return { ok: true, won: this.engine.isWon() };
+      } finally {
+        this.animating = false;
+      }
     }
 
     _spawnConfetti() {
